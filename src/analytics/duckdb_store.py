@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import Any
 from pathlib import Path
 
 import duckdb
@@ -80,5 +80,21 @@ def table_exists(table_name: str) -> bool:
         ).fetchone()
 
         return bool(result and result[0] > 0)
+    finally:
+        connection.close()
+
+def execute_query(
+    query: str,
+    parameters: list[Any] | None = None,
+) -> pd.DataFrame:
+    """Execute a parameterized SQL query and return a DataFrame."""
+
+    connection = get_connection()
+
+    try:
+        return connection.execute(
+            query,
+            parameters or [],
+        ).fetchdf()
     finally:
         connection.close()

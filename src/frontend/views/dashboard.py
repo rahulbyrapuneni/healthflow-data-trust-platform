@@ -15,8 +15,8 @@ def render_dashboard(
     st.title("Enterprise Data Trust Overview")
 
     st.caption(
-       "Enterprise data-quality monitoring for clinical, "
-    "operational, and financial healthcare domains."
+    "Enterprise data-quality monitoring for clinical, "
+    "operational, and financial healthcare domains"
     )
 
     platform_score = calculate_platform_score(summary)
@@ -72,8 +72,6 @@ def render_dashboard(
     
     st.divider()
 
-    st.subheader("Dataset Health")
-   
 
     left_column, right_column = st.columns([2, 1])
 

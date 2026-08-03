@@ -40,8 +40,8 @@ def main() -> None:
     except FileNotFoundError as error:
         st.error(str(error))
         st.info(
-            "Run the ingestion and quality pipelines before "
-            "starting the frontend."
+            "Run the quality pipeline and DuckDB analytics loader "
+            "before starting the frontend."
         )
         st.stop()
 
@@ -55,7 +55,7 @@ def main() -> None:
         render_trends(summary_history)
 
     def issues_page() -> None:
-        render_issues(issues)
+        render_issues()
 
     def api_sources_page() -> None:
         st.title("API Sources")

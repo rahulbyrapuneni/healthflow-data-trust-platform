@@ -1,37 +1,62 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pandas as pd
 
-
-QUALITY_RESULTS_PATH = Path("data/quality_results")
-SUMMARY_FILE = QUALITY_RESULTS_PATH / "dataset_trust_summary.csv"
-ISSUES_FILE = QUALITY_RESULTS_PATH / "all_quality_issues.csv"
+from src.analytics.duckdb_store import (
+    execute_query,
+    read_table,
+    table_exists,
+)
 
 
 def load_summary() -> pd.DataFrame:
-    """Load the latest dataset-level trust summary."""
+    """Load the latest dataset trust summary from DuckDB."""
 
-    if not SUMMARY_FILE.exists():
+    if not table_exists("dataset_trust_summary"):
         raise FileNotFoundError(
-            "dataset_trust_summary.csv was not found. "
-            "Run the quality engine first."
+            "DuckDB table 'dataset_trust_summary' was not found. "
+            "Run the analytics loader first."
         )
 
-    return pd.read_csv(SUMMARY_FILE)
+    return read_table("dataset_trust_summary")
 
 
 def load_issues() -> pd.DataFrame:
-    """Load the latest quality issue results."""
+    """Load quality issues from DuckDB."""
 
-    if not ISSUES_FILE.exists():
+    if not table_exists("quality_issues"):
         raise FileNotFoundError(
-            "all_quality_issues.csv was not found. "
-            "Run the quality engine first."
+            "DuckDB table 'quality_issues' was not found. "
+            "Run the analytics loader first."
         )
 
-    return pd.read_csv(ISSUES_FILE)
+    return read_table("quality_issues")
+
+
+def load_summary_history() -> pd.DataFrame:
+    """Load dataset trust history from DuckDB."""
+
+    if not table_exists("dataset_trust_history"):
+        return pd.DataFrame()
+
+    history = read_table("dataset_trust_history")
+
+    if "run_timestamp" in history.columns:
+        history["run_timestamp"] = pd.to_datetime(
+            history["run_timestamp"],
+            errors="coerce",
+        )
+
+    return history
+
+
+def load_cms_hospitals() -> pd.DataFrame:
+    """Load CMS hospital records from DuckDB."""
+
+    if not table_exists("cms_hospitals"):
+        return pd.DataFrame()
+
+    return read_table("cms_hospitals")
 
 
 def calculate_platform_score(summary: pd.DataFrame) -> float:
@@ -47,53 +72,25 @@ def calculate_platform_score(summary: pd.DataFrame) -> float:
         * summary["rows_checked"]
     ).sum()
 
-    return round(float(weighted_score / total_rows), 2)
-
-def load_summary_history() -> pd.DataFrame:
-    """Load and combine all historical trust-summary files."""
-
-    history_path = QUALITY_RESULTS_PATH / "history"
-
-    if not history_path.exists():
-        return pd.DataFrame()
-
-    history_files = sorted(
-        history_path.glob("summary_*.csv")
+    return round(
+        float(weighted_score / total_rows),
+        2,
     )
-
-    if not history_files:
-        return pd.DataFrame()
-
-    frames = [
-        pd.read_csv(file_path)
-        for file_path in history_files
-    ]
-
-    history = pd.concat(
-        frames,
-        ignore_index=True,
-    )
-
-    if "run_timestamp" in history.columns:
-        history["run_timestamp"] = pd.to_datetime(
-            history["run_timestamp"],
-            errors="coerce",
-        )
-
-    return history
 
 
 def build_platform_history(
     summary_history: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Calculate one platform score for every quality run."""
+    """Calculate one platform score for each quality run."""
 
     if summary_history.empty:
         return pd.DataFrame()
 
     rows: list[dict] = []
 
-    for run_id, run_data in summary_history.groupby("run_id"):
+    for run_id, run_data in summary_history.groupby(
+        "run_id"
+    ):
         total_rows = run_data["rows_checked"].sum()
 
         if total_rows <= 0:
@@ -116,14 +113,155 @@ def build_platform_history(
                 ),
                 "rows_checked": int(total_rows),
                 "issues_detected": int(
-                    run_data["issues_detected"].sum()
+                    run_data[
+                        "issues_detected"
+                    ].sum()
                 ),
                 "critical_issues": int(
-                    run_data["critical_issues"].sum()
+                    run_data[
+                        "critical_issues"
+                    ].sum()
                 ),
             }
         )
 
-    result = pd.DataFrame(rows)
+    return (
+        pd.DataFrame(rows)
+        .sort_values("run_timestamp")
+        .reset_index(drop=True)
+    )
 
-    return result.sort_values("run_timestamp")
+def load_issue_filter_options() -> dict[str, list[str]]:
+    """Load distinct Issue Explorer filter values."""
+
+    if not table_exists("quality_issues"):
+        return {
+            "datasets": [],
+            "severities": [],
+            "source_systems": [],
+        }
+
+    datasets = execute_query(
+        """
+        SELECT DISTINCT dataset
+        FROM quality_issues
+        WHERE dataset IS NOT NULL
+        ORDER BY dataset
+        """
+    )
+
+    severities = execute_query(
+        """
+        SELECT DISTINCT severity
+        FROM quality_issues
+        WHERE severity IS NOT NULL
+        ORDER BY severity
+        """
+    )
+
+    source_systems = execute_query(
+        """
+        SELECT DISTINCT source_system
+        FROM quality_issues
+        WHERE source_system IS NOT NULL
+        ORDER BY source_system
+        """
+    )
+
+    return {
+        "datasets": datasets["dataset"].tolist(),
+        "severities": severities["severity"].tolist(),
+        "source_systems": source_systems[
+            "source_system"
+        ].tolist(),
+    }
+
+
+def query_quality_issues(
+    dataset: str | None = None,
+    severity: str | None = None,
+    source_system: str | None = None,
+    search_text: str | None = None,
+) -> pd.DataFrame:
+    """Query quality issues using optional filters."""
+
+    if not table_exists("quality_issues"):
+        return pd.DataFrame()
+
+    conditions: list[str] = []
+    parameters: list[str] = []
+
+    if dataset:
+        conditions.append("dataset = ?")
+        parameters.append(dataset)
+
+    if severity:
+        conditions.append("severity = ?")
+        parameters.append(severity)
+
+    if source_system:
+        conditions.append("source_system = ?")
+        parameters.append(source_system)
+
+    if search_text and search_text.strip():
+        conditions.append(
+            """
+            (
+                LOWER(CAST(record_id AS VARCHAR)) LIKE ?
+                OR LOWER(rule) LIKE ?
+                OR LOWER(message) LIKE ?
+                OR LOWER(recommendation) LIKE ?
+            )
+            """
+        )
+
+        search_value = f"%{search_text.strip().lower()}%"
+
+        parameters.extend(
+            [
+                search_value,
+                search_value,
+                search_value,
+                search_value,
+            ]
+        )
+
+    where_clause = ""
+
+    if conditions:
+        where_clause = (
+            "WHERE " + " AND ".join(conditions)
+        )
+
+    query = f"""
+        SELECT
+            dataset,
+            record_id,
+            field,
+            rule,
+            severity,
+            category,
+            source_system,
+            message,
+            business_impact,
+            recommendation,
+            run_id,
+            run_timestamp
+        FROM quality_issues
+        {where_clause}
+        ORDER BY
+            CASE severity
+                WHEN 'Critical' THEN 1
+                WHEN 'High' THEN 2
+                WHEN 'Medium' THEN 3
+                WHEN 'Low' THEN 4
+                ELSE 5
+            END,
+            dataset,
+            rule
+    """
+
+    return execute_query(
+        query=query,
+        parameters=parameters,
+    )
