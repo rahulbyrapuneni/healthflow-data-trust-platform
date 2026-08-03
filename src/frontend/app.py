@@ -85,52 +85,52 @@ def main() -> None:
         render_about()
 
     pages = [
-        st.Page(
-            dashboard_page,
-            title="Dashboard",
-            icon=":material/dashboard:",
-            default=True,
-        ),
-        st.Page(
-            trends_page,
-            title="Trust Trends",
-            icon=":material/monitoring:",
-        ),
-        st.Page(
-            issues_page,
-            title="Issue Explorer",
-            icon=":material/search:",
-        ),
-        st.Page(
-            api_sources_page,
-            title="API Sources",
-            icon=":material/cloud_sync:",
-        ),
-        st.Page(
-            rule_explorer_page,
-            title="Rule Explorer",
-            icon=":material/rule:",
-        ),
-        st.Page(
-            pipeline_runs_page,
-            title="Pipeline Runs",
-            icon=":material/history:",
-        ),
+    st.Page(
+        dashboard_page,
+        title="Dashboard",
+        icon=":material/dashboard:",
+        default=True,
+        url_path="dashboard",
+    ),
+    st.Page(
+        trends_page,
+        title="Trust Trends",
+        icon=":material/monitoring:",
+        url_path="trust-trends",
+    ),
+    st.Page(
+        issues_page,
+        title="Issue Explorer",
+        icon=":material/search:",
+        url_path="issue-explorer",
+    ),
+    st.Page(
+        api_sources_page,
+        title="Data Sources",
+        icon=":material/database:",
+        url_path="data-sources",
+    ),
+    st.Page(
+        rule_explorer_page,
+        title="Rule Catalog",
+        icon=":material/rule:",
+        url_path="rule-catalog",
+    ),
+    st.Page(
+        pipeline_runs_page,
+        title="Pipeline Runs",
+        icon=":material/history:",
+        url_path="pipeline-runs",
+    ),
+    st.Page(
+        about_page,
+        title="About",
+        icon=":material/info:",
+        url_path="about",
+    ),
+]
 
-        st.Page(
-            api_sources_page,
-            title="Data Sources",
-            icon=":material/database:",
-        ),
-
-        st.Page(
-            about_page,
-            title="About",
-            icon=":material/info:",
-        ),
-
-    ]
-
+    
     navigation = st.navigation(
         pages,
         position="sidebar",
