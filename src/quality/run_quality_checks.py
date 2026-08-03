@@ -1,8 +1,10 @@
 from datetime import date
+import logging
 from pathlib import Path
 
 import pandas as pd
 
+from src.core.logging_config import configure_logging
 from src.quality.appointment_rules import check_appointments
 from src.quality.claim_rules import check_claims
 from src.quality.insurance_rules import check_insurance
@@ -20,6 +22,8 @@ from src.quality.run_metadata import create_run_metadata
 INGESTED_DATA_PATH = Path("data/ingested")
 OUTPUT_PATH = Path("data/quality_results")
 
+logger = logging.getLogger("healthflow.quality")
+
 
 def load_dataset(dataset_name: str) -> pd.DataFrame:
     """Load one ingested dataset."""
@@ -32,11 +36,35 @@ def load_dataset(dataset_name: str) -> pd.DataFrame:
             "Run the ingestion process first."
         )
 
-    return pd.read_csv(dataset_path)
+    logger.info(
+        "Loading dataset=%s from path=%s",
+        dataset_name,
+        dataset_path,
+    )
+
+    dataframe = pd.read_csv(dataset_path)
+
+    logger.info(
+        "Loaded dataset=%s with rows=%s",
+        dataset_name,
+        len(dataframe),
+    )
+
+    return dataframe
 
 
 def main() -> None:
+    configure_logging()
+
+    logger.info("Starting HealthFlow quality-check execution")
+
     run_metadata = create_run_metadata()
+
+    logger.info(
+        "Created quality run with run_id=%s and timestamp=%s",
+        run_metadata.run_id,
+        run_metadata.run_timestamp,
+    )
 
     patients = load_dataset("patients")
     appointments = load_dataset("appointments")
@@ -44,11 +72,33 @@ def main() -> None:
     claims = load_dataset("claims")
     insurance = load_dataset("insurance")
 
+    logger.info(
+        (
+            "Loaded all datasets: patients=%s, appointments=%s, "
+            "labs=%s, claims=%s, insurance=%s"
+        ),
+        len(patients),
+        len(appointments),
+        len(labs),
+        len(claims),
+        len(insurance),
+    )
+
     patient_issues = check_patients(patients)
+
+    logger.info(
+        "Patient quality checks completed with issues=%s",
+        len(patient_issues),
+    )
 
     appointment_issues = check_appointments(
         appointments=appointments,
         patients=patients,
+    )
+
+    logger.info(
+        "Appointment quality checks completed with issues=%s",
+        len(appointment_issues),
     )
 
     lab_issues = check_labs(
@@ -56,14 +106,29 @@ def main() -> None:
         patients=patients,
     )
 
+    logger.info(
+        "Laboratory quality checks completed with issues=%s",
+        len(lab_issues),
+    )
+
     claim_issues = check_claims(
         claims=claims,
         patients=patients,
     )
 
+    logger.info(
+        "Claim quality checks completed with issues=%s",
+        len(claim_issues),
+    )
+
     insurance_issues = check_insurance(
         insurance=insurance,
         patients=patients,
+    )
+
+    logger.info(
+        "Insurance quality checks completed with issues=%s",
+        len(insurance_issues),
     )
 
     all_issues = pd.concat(
@@ -77,7 +142,14 @@ def main() -> None:
         ignore_index=True,
     )
 
+    logger.info(
+        "Combined quality results contain issues=%s",
+        len(all_issues),
+    )
+
     all_issues = enrich_issues(all_issues)
+
+    logger.info("Issue enrichment completed")
 
     all_issues.insert(
         0,
@@ -104,6 +176,11 @@ def main() -> None:
         all_issues=all_issues,
     )
 
+    logger.info(
+        "Dataset trust summary created with rows=%s",
+        len(dataset_summary),
+    )
+
     dataset_summary.insert(
         0,
         "run_timestamp",
@@ -128,13 +205,8 @@ def main() -> None:
         exist_ok=True,
     )
 
-    output_file = (
-        OUTPUT_PATH / "all_quality_issues.csv"
-    )
-
-    summary_file = (
-        OUTPUT_PATH / "dataset_trust_summary.csv"
-    )
+    output_file = OUTPUT_PATH / "all_quality_issues.csv"
+    summary_file = OUTPUT_PATH / "dataset_trust_summary.csv"
 
     run_date = date.today().isoformat()
 
@@ -153,9 +225,19 @@ def main() -> None:
         index=False,
     )
 
+    logger.info(
+        "Quality issue report written to path=%s",
+        output_file,
+    )
+
     dataset_summary.to_csv(
         summary_file,
         index=False,
+    )
+
+    logger.info(
+        "Dataset trust summary written to path=%s",
+        summary_file,
     )
 
     all_issues.to_csv(
@@ -163,9 +245,19 @@ def main() -> None:
         index=False,
     )
 
+    logger.info(
+        "Issue history written to path=%s",
+        issue_history_file,
+    )
+
     dataset_summary.to_csv(
         summary_history_file,
         index=False,
+    )
+
+    logger.info(
+        "Summary history written to path=%s",
+        summary_history_file,
     )
 
     print_quality_report(
@@ -229,6 +321,10 @@ def main() -> None:
     print(
         f"Summary history written to: "
         f"{summary_history_file}"
+    )
+
+    logger.info(
+        "HealthFlow quality-check execution completed successfully"
     )
 
 

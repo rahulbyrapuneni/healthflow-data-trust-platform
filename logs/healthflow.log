@@ -1,0 +1,26 @@
+2026-08-03 11:27:07 | INFO | healthflow.quality | Starting HealthFlow quality-check execution
+2026-08-03 11:27:07 | INFO | healthflow.quality | Created quality run with run_id=c6fcd669-1a74-4ff5-a8cb-1b9622baac83 and timestamp=2026-08-03T15:27:07.300377+00:00
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loading dataset=patients from path=data\ingested\patients.csv
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loaded dataset=patients with rows=501
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loading dataset=appointments from path=data\ingested\appointments.csv
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loaded dataset=appointments with rows=1500
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loading dataset=labs from path=data\ingested\labs.csv
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loaded dataset=labs with rows=2500
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loading dataset=claims from path=data\ingested\claims.csv
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loaded dataset=claims with rows=1200
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loading dataset=insurance from path=data\ingested\insurance.csv
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loaded dataset=insurance with rows=459
+2026-08-03 11:27:07 | INFO | healthflow.quality | Loaded all datasets: patients=501, appointments=1500, labs=2500, claims=1200, insurance=459
+2026-08-03 11:27:07 | INFO | healthflow.quality | Patient quality checks completed with issues=5
+2026-08-03 11:27:07 | INFO | healthflow.quality | Appointment quality checks completed with issues=1
+2026-08-03 11:27:08 | INFO | healthflow.quality | Laboratory quality checks completed with issues=2
+2026-08-03 11:27:08 | INFO | healthflow.quality | Claim quality checks completed with issues=2
+2026-08-03 11:27:08 | INFO | healthflow.quality | Insurance quality checks completed with issues=0
+2026-08-03 11:27:08 | INFO | healthflow.quality | Combined quality results contain issues=10
+2026-08-03 11:27:08 | INFO | healthflow.quality | Issue enrichment completed
+2026-08-03 11:27:08 | INFO | healthflow.quality | Dataset trust summary created with rows=5
+2026-08-03 11:27:08 | INFO | healthflow.quality | Quality issue report written to path=data\quality_results\all_quality_issues.csv
+2026-08-03 11:27:08 | INFO | healthflow.quality | Dataset trust summary written to path=data\quality_results\dataset_trust_summary.csv
+2026-08-03 11:27:08 | INFO | healthflow.quality | Issue history written to path=data\quality_results\history\issues_2026-08-03_c6fcd669-1a74-4ff5-a8cb-1b9622baac83.csv
+2026-08-03 11:27:08 | INFO | healthflow.quality | Summary history written to path=data\quality_results\history\summary_2026-08-03_c6fcd669-1a74-4ff5-a8cb-1b9622baac83.csv
+2026-08-03 11:27:08 | INFO | healthflow.quality | HealthFlow quality-check execution completed successfully
