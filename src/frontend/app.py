@@ -1,26 +1,28 @@
 from __future__ import annotations
-from src.frontend.views.data_sources import (
-    render_data_sources,
-)
+
+import sys
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 
 import streamlit as st
 
 from src.frontend.data_loader import (
     load_issues,
     load_summary,
-)
-from src.frontend.styles import apply_ehr_styles
-
-from src.frontend.data_loader import (
-    load_issues,
-    load_summary,
     load_summary_history,
 )
-
-from src.frontend.views.trends import render_trends
+from src.frontend.styles import apply_ehr_styles
 from src.frontend.views.about import render_about
 from src.frontend.views.dashboard import render_dashboard
+from src.frontend.views.data_sources import render_data_sources
 from src.frontend.views.issues import render_issues
+from src.frontend.views.trends import render_trends
 
 
 def main() -> None:
