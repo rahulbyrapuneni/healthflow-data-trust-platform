@@ -38,7 +38,7 @@ def apply_ehr_styles() -> None:
         /* Main content container */
         [data-testid="stMainBlockContainer"] {
             max-width: 1450px;
-            padding-top: 0.25rem;
+            padding-top: 0.75rem;
             padding-bottom: 3rem;
             padding-left: 2rem;
             padding-right: 2rem;
@@ -291,4 +291,3 @@ def apply_ehr_styles() -> None:
         unsafe_allow_html=True,
     )
 
-    
