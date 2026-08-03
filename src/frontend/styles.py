@@ -25,9 +25,20 @@ def apply_ehr_styles() -> None:
             color: var(--hf-text);
         }
 
-        .main .block-container {
+        /* Reduce Streamlit's reserved top area */
+        [data-testid="stHeader"] {
+            height: 2.25rem;
+            background-color: transparent;
+        }
+
+        [data-testid="stMain"] {
+            padding-top: 0;
+        }
+
+        /* Main content container */
+        [data-testid="stMainBlockContainer"] {
             max-width: 1450px;
-            padding-top: 1.25rem;
+            padding-top: 0.25rem;
             padding-bottom: 3rem;
             padding-left: 2rem;
             padding-right: 2rem;
@@ -91,13 +102,11 @@ def apply_ehr_styles() -> None:
             border-radius: 0;
         }
 
-        /* Active page text */
         [data-testid="stSidebarNav"] a[aria-current="page"] span {
             color: var(--hf-white) !important;
             font-weight: 600;
         }
 
-        /* Active page icon */
         [data-testid="stSidebarNav"] a[aria-current="page"] svg,
         [data-testid="stSidebarNav"] a[aria-current="page"] svg path {
             fill: var(--hf-white) !important;
@@ -127,6 +136,7 @@ def apply_ehr_styles() -> None:
             font-size: 1.75rem;
             font-weight: 600;
             padding-bottom: 0.45rem;
+            margin-top: 0;
             border-bottom: 2px solid var(--hf-navy);
         }
 
@@ -266,7 +276,8 @@ def apply_ehr_styles() -> None:
 
         /* Responsive layout */
         @media (max-width: 900px) {
-            .main .block-container {
+            [data-testid="stMainBlockContainer"] {
+                padding-top: 0.25rem;
                 padding-left: 1rem;
                 padding-right: 1rem;
             }
@@ -279,3 +290,5 @@ def apply_ehr_styles() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+    

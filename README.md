@@ -6,6 +6,12 @@ An open-source healthcare data quality platform that answers one practical quest
 
 The platform generates synthetic healthcare data, detects quality problems, scores data trustworthiness, and explains issues in a reproducible local environment.
 
+## 🌐 Live Demo
+
+**Streamlit Application**
+
+https://baz83aeke5yvqtrpbbavuc.streamlit.app/
+
 ## Core problem
 
 Healthcare organizations combine data from registration, scheduling, laboratory, billing, insurance, and clinical systems. The resulting datasets often contain duplicate patients, missing demographics, invalid clinical codes, orphan records, inconsistent dates, and conflicting values.

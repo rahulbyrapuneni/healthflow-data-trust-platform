@@ -141,10 +141,7 @@ def main() -> None:
     with st.sidebar:
         st.markdown("## HealthFlow")
         st.caption("Healthcare Data Trust Platform")
-        st.divider()
-        st.caption("DATA GOVERNANCE MODULE")
-        st.divider()
-        st.caption("Version 0.2")
+        st.caption("Version 0.5")
 
     navigation.run()
 
