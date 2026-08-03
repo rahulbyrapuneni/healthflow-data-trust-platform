@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-07-31T12:06:35.763425",
+  "seed": 42,
+  "row_counts": {
+    "patients": 501,
+    "appointments": 1500,
+    "labs": 2500,
+    "insurance": 459,
+    "claims": 1200
+  }
+}
