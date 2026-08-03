@@ -76,3 +76,7 @@
 2026-08-03 12:51:31 | INFO | healthflow.quality | Issue history written to path=data\quality_results\history\issues_2026-08-03_de21a806-1f5e-4524-a5d1-0f0c1544c9ec.csv
 2026-08-03 12:51:31 | INFO | healthflow.quality | Summary history written to path=data\quality_results\history\summary_2026-08-03_de21a806-1f5e-4524-a5d1-0f0c1544c9ec.csv
 2026-08-03 12:51:31 | INFO | healthflow.quality | HealthFlow quality-check execution completed successfully
+2026-08-03 13:48:36 | INFO | healthflow.cms | Starting CMS hospital-data ingestion
+2026-08-03 13:48:36 | INFO | healthflow.api | Sending GET request source=CMS Provider Data Catalog endpoint=https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0
+2026-08-03 13:48:37 | INFO | healthflow.api | API request completed source=CMS Provider Data Catalog status=200 rows=100
+2026-08-03 13:48:37 | INFO | healthflow.cms | CMS ingestion completed rows=100 output=data\external\cms\hospitals.csv

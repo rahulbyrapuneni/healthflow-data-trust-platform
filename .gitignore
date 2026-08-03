@@ -21,3 +21,10 @@ data/quality_results/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Application logs
+logs/
+*.log
+
+# Downloaded external healthcare data
+data/external/
