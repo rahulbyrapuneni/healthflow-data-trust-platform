@@ -1,6 +1,5 @@
 from __future__ import annotations
-
-import logging
+from src.core.logging_config import get_logger
 from typing import Any
 from urllib.parse import urljoin
 
@@ -17,7 +16,7 @@ from src.api.exceptions import (
 from src.api.models import APIResponse
 
 
-logger = logging.getLogger("healthflow.api")
+logger = get_logger("api")
 
 
 class BaseAPIClient:

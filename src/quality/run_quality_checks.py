@@ -1,5 +1,5 @@
 from datetime import date
-import logging
+from src.core.logging_config import get_logger
 from pathlib import Path
 
 import pandas as pd
@@ -17,12 +17,15 @@ from src.quality.platform_report import (
 )
 from src.quality.quality_report import print_quality_report
 from src.quality.run_metadata import create_run_metadata
+from src.quality.cms_hospital_rules import (
+    check_cms_hospitals,
+)
 
 
 INGESTED_DATA_PATH = Path("data/ingested")
 OUTPUT_PATH = Path("data/quality_results")
 
-logger = logging.getLogger("healthflow.quality")
+logger = get_logger("quality")
 
 
 def load_dataset(dataset_name: str) -> pd.DataFrame:
@@ -71,6 +74,9 @@ def main() -> None:
     labs = load_dataset("labs")
     claims = load_dataset("claims")
     insurance = load_dataset("insurance")
+    cms_hospitals = pd.read_csv(
+    "data/external/cms/hospitals.csv"
+    )
 
     logger.info(
         (
@@ -131,6 +137,10 @@ def main() -> None:
         len(insurance_issues),
     )
 
+    cms_issues = check_cms_hospitals(
+    cms_hospitals
+    )
+
     all_issues = pd.concat(
         [
             patient_issues,
@@ -138,6 +148,7 @@ def main() -> None:
             lab_issues,
             claim_issues,
             insurance_issues,
+            cms_issues,
         ],
         ignore_index=True,
     )
@@ -169,6 +180,7 @@ def main() -> None:
         "labs": len(labs),
         "claims": len(claims),
         "insurance": len(insurance),
+        "cms_hospitals": len(cms_hospitals),
     }
 
     dataset_summary = build_dataset_summary(
@@ -297,6 +309,16 @@ def main() -> None:
         row_count=len(insurance),
         issues=insurance_issues,
     )
+
+    print()
+
+    print_quality_report(
+        dataset_name="CMS Hospitals",
+        row_count=len(cms_hospitals),
+        issues=cms_issues,
+    )
+
+    print()
 
     print_platform_report(dataset_summary)
 

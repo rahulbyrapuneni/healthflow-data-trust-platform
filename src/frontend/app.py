@@ -1,4 +1,7 @@
 from __future__ import annotations
+from src.frontend.views.data_sources import (
+    render_data_sources,
+)
 
 import streamlit as st
 
@@ -75,6 +78,9 @@ def main() -> None:
             "added in an upcoming milestone."
         )
 
+    def api_sources_page() -> None:
+        render_data_sources()
+
     def about_page() -> None:
         render_about()
 
@@ -110,11 +116,19 @@ def main() -> None:
             title="Pipeline Runs",
             icon=":material/history:",
         ),
+
+        st.Page(
+            api_sources_page,
+            title="Data Sources",
+            icon=":material/database:",
+        ),
+
         st.Page(
             about_page,
             title="About",
             icon=":material/info:",
         ),
+
     ]
 
     navigation = st.navigation(

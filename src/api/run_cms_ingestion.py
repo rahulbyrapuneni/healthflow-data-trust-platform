@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import logging
+from src.core.logging_config import get_logger
 from pathlib import Path
 
 from src.api.cms_client import CMSClient
@@ -10,7 +10,7 @@ from src.core.logging_config import configure_logging
 OUTPUT_DIRECTORY = Path("data/external/cms")
 OUTPUT_FILE = OUTPUT_DIRECTORY / "hospitals.csv"
 
-logger = logging.getLogger("healthflow.cms")
+logger = get_logger("pipeline")
 
 
 def main() -> None:
