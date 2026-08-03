@@ -3,3 +3,4 @@ Faker==37.4.2
 duckdb==1.4.3
 pytest==9.0.0
 streamlit
+requests
