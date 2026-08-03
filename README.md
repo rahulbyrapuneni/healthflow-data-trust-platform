@@ -103,3 +103,7 @@ The generated CSV files will appear in `data/raw/`.
 ## Portfolio outcome
 
 This project demonstrates healthcare data engineering, data quality, governance, analytics engineering, SQL, Python, testing, architecture, and technical communication without relying on restricted systems or paid services.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
