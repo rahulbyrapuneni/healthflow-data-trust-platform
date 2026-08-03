@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -13,6 +14,7 @@ from src.quality.platform_report import (
     print_platform_report,
 )
 from src.quality.quality_report import print_quality_report
+from src.quality.run_metadata import create_run_metadata
 
 
 INGESTED_DATA_PATH = Path("data/ingested")
@@ -34,6 +36,8 @@ def load_dataset(dataset_name: str) -> pd.DataFrame:
 
 
 def main() -> None:
+    run_metadata = create_run_metadata()
+
     patients = load_dataset("patients")
     appointments = load_dataset("appointments")
     labs = load_dataset("labs")
@@ -75,6 +79,18 @@ def main() -> None:
 
     all_issues = enrich_issues(all_issues)
 
+    all_issues.insert(
+        0,
+        "run_timestamp",
+        run_metadata.run_timestamp,
+    )
+
+    all_issues.insert(
+        0,
+        "run_id",
+        run_metadata.run_id,
+    )
+
     dataset_rows = {
         "patients": len(patients),
         "appointments": len(appointments),
@@ -88,13 +104,49 @@ def main() -> None:
         all_issues=all_issues,
     )
 
+    dataset_summary.insert(
+        0,
+        "run_timestamp",
+        run_metadata.run_timestamp,
+    )
+
+    dataset_summary.insert(
+        0,
+        "run_id",
+        run_metadata.run_id,
+    )
+
     OUTPUT_PATH.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    output_file = OUTPUT_PATH / "all_quality_issues.csv"
-    summary_file = OUTPUT_PATH / "dataset_trust_summary.csv"
+    history_path = OUTPUT_PATH / "history"
+
+    history_path.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    output_file = (
+        OUTPUT_PATH / "all_quality_issues.csv"
+    )
+
+    summary_file = (
+        OUTPUT_PATH / "dataset_trust_summary.csv"
+    )
+
+    run_date = date.today().isoformat()
+
+    issue_history_file = (
+        history_path
+        / f"issues_{run_date}_{run_metadata.run_id}.csv"
+    )
+
+    summary_history_file = (
+        history_path
+        / f"summary_{run_date}_{run_metadata.run_id}.csv"
+    )
 
     all_issues.to_csv(
         output_file,
@@ -103,6 +155,16 @@ def main() -> None:
 
     dataset_summary.to_csv(
         summary_file,
+        index=False,
+    )
+
+    all_issues.to_csv(
+        issue_history_file,
+        index=False,
+    )
+
+    dataset_summary.to_csv(
+        summary_history_file,
         index=False,
     )
 
@@ -146,6 +208,9 @@ def main() -> None:
 
     print_platform_report(dataset_summary)
 
+    print(f"\nRun ID: {run_metadata.run_id}")
+    print(f"Run timestamp: {run_metadata.run_timestamp}")
+
     print(
         f"\nCombined issue results written to: "
         f"{output_file}"
@@ -154,6 +219,16 @@ def main() -> None:
     print(
         f"Dataset trust summary written to: "
         f"{summary_file}"
+    )
+
+    print(
+        f"Issue history written to: "
+        f"{issue_history_file}"
+    )
+
+    print(
+        f"Summary history written to: "
+        f"{summary_history_file}"
     )
 
 
