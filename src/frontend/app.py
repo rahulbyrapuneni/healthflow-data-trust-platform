@@ -1,4 +1,7 @@
 from __future__ import annotations
+from src.frontend.views.rule_catalog import (
+    render_rule_catalog,
+)
 
 import sys
 from pathlib import Path
@@ -67,11 +70,7 @@ def main() -> None:
         )
 
     def rule_explorer_page() -> None:
-        st.title("Rule Explorer")
-        st.info(
-            "Data-quality rule documentation and configuration "
-            "will be added in an upcoming milestone."
-        )
+        render_rule_catalog()
 
     def pipeline_runs_page() -> None:
         st.title("Pipeline Runs")

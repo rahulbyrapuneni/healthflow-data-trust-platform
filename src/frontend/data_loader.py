@@ -8,6 +8,7 @@ from src.analytics.duckdb_store import (
     table_exists,
 )
 
+from src.quality.rule_metadata import get_rule_metadata
 
 def load_summary() -> pd.DataFrame:
     """Load the latest dataset trust summary from DuckDB."""
@@ -265,3 +266,115 @@ def query_quality_issues(
         query=query,
         parameters=parameters,
     )
+
+def load_rule_catalog() -> pd.DataFrame:
+    """Build a catalog of quality rules executed by HealthFlow."""
+
+    columns = [
+        "rule",
+        "dataset",
+        "severity",
+        "category",
+        "source_system",
+        "business_impact",
+        "recommendation",
+        "issue_count",
+    ]
+
+    if not table_exists("quality_issues"):
+        return pd.DataFrame(columns=columns)
+
+    rules = execute_query(
+        """
+        SELECT
+            rule,
+            dataset,
+            severity,
+            COUNT(*) AS issue_count
+        FROM quality_issues
+        WHERE rule IS NOT NULL
+        GROUP BY
+            rule,
+            dataset,
+            severity
+        ORDER BY
+            CASE severity
+                WHEN 'Critical' THEN 1
+                WHEN 'High' THEN 2
+                WHEN 'Medium' THEN 3
+                WHEN 'Low' THEN 4
+                ELSE 5
+            END,
+            dataset,
+            rule
+        """
+    )
+
+    if rules.empty:
+        return pd.DataFrame(columns=columns)
+
+    metadata = rules["rule"].apply(get_rule_metadata)
+
+    rules["category"] = metadata.apply(
+        lambda value: value.get(
+            "category",
+            "Uncategorized",
+        )
+    )
+
+    rules["source_system"] = metadata.apply(
+        lambda value: value.get(
+            "source_system",
+            "Not specified",
+        )
+    )
+
+    rules["business_impact"] = metadata.apply(
+        lambda value: value.get(
+            "business_impact",
+            "Not documented",
+        )
+    )
+
+    rules["recommendation"] = metadata.apply(
+        lambda value: value.get(
+            "recommendation",
+            "Not documented",
+        )
+    )
+
+    return rules[columns]
+
+
+def load_rule_filter_options() -> dict[str, list[str]]:
+    """Return distinct Rule Catalog filter options."""
+
+    catalog = load_rule_catalog()
+
+    if catalog.empty:
+        return {
+            "datasets": [],
+            "severities": [],
+            "categories": [],
+        }
+
+    return {
+        "datasets": sorted(
+            catalog["dataset"]
+            .dropna()
+            .unique()
+            .tolist()
+        ),
+        "severities": sorted(
+            catalog["severity"]
+            .dropna()
+            .unique()
+            .tolist()
+        ),
+        "categories": sorted(
+            catalog["category"]
+            .dropna()
+            .unique()
+            .tolist()
+        ),
+    }

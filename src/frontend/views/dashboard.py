@@ -76,7 +76,7 @@ def render_dashboard(
     left_column, right_column = st.columns([2, 1])
 
     with left_column:
-        st.subheader("Dataset Health")
+        st.subheader("Datasets Monitored")
 
         dataset_health = summary[
             [
