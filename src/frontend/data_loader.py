@@ -463,3 +463,61 @@ def load_pipeline_run_details(
         """,
         [run_id],
     )
+
+def load_data_dictionary_tables() -> pd.DataFrame:
+    """Return available HealthFlow analytics tables."""
+
+    return execute_query(
+        """
+        SELECT
+            table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'main'
+        ORDER BY table_name
+        """
+    )
+
+
+def load_data_dictionary_columns(
+    table_name: str,
+) -> pd.DataFrame:
+    """Return column metadata for one DuckDB table."""
+
+    if not table_name:
+        return pd.DataFrame()
+
+    return execute_query(
+        """
+        SELECT
+            column_name,
+            data_type,
+            is_nullable,
+            ordinal_position
+        FROM information_schema.columns
+        WHERE table_schema = 'main'
+          AND table_name = ?
+        ORDER BY ordinal_position
+        """,
+        [table_name],
+    )
+
+
+def load_table_profile(
+    table_name: str,
+) -> pd.DataFrame:
+    """Return basic record and column counts for a table."""
+
+    allowed_tables = load_data_dictionary_tables()
+
+    if table_name not in allowed_tables["table_name"].tolist():
+        raise ValueError("Unknown analytics table.")
+
+    return execute_query(
+        f"""
+        SELECT
+            COUNT(*) AS record_count,
+            {len(load_data_dictionary_columns(table_name))}
+                AS column_count
+        FROM {table_name}
+        """
+    )

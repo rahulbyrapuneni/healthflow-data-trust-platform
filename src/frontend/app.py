@@ -1,7 +1,4 @@
 from __future__ import annotations
-from src.frontend.views.rule_catalog import (
-    render_rule_catalog,
-)
 
 import sys
 from pathlib import Path
@@ -13,6 +10,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.frontend.views.rule_catalog import render_rule_catalog
+
+from src.frontend.views.rule_catalog import (
+    render_rule_catalog,
+)
+
+
 
 import streamlit as st
 
@@ -23,6 +27,12 @@ from src.frontend.data_loader import (
 )
 from src.frontend.views.pipeline_runs import (
     render_pipeline_runs,
+)
+from src.frontend.views.data_lineage import (
+    render_data_lineage,
+)
+from src.frontend.views.data_dictionary import (
+    render_data_dictionary,
 )
 from src.frontend.styles import apply_ehr_styles
 from src.frontend.views.about import render_about
@@ -88,6 +98,14 @@ def main() -> None:
     def audit_logs_page() -> None:
         render_audit_logs()
 
+    def data_lineage_page() -> None:
+        render_data_lineage()
+
+    def data_dictionary_page() -> None:
+        render_data_dictionary()
+    def main() -> None:
+        render_rule_catalog()
+
     pages = [
     st.Page(
         dashboard_page,
@@ -131,7 +149,22 @@ def main() -> None:
          title="Audit Logs",
          icon=":material/description:",
          url_path="audit-logs",
-     ),   
+     ), 
+
+    st.Page(
+        data_lineage_page,
+        title="Data Lineage",
+        icon=":material/account_tree:",
+        url_path="data-lineage",
+    ),
+
+    st.Page(
+        data_dictionary_page,
+        title="Data Dictionary",
+        icon=":material/dictionary:",
+        url_path="data-dictionary",
+    ),
+       
     st.Page(
         about_page,
         title="About",
