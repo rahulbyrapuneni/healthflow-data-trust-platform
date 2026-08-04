@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from src.frontend.data_loader import calculate_platform_score
+from src.utils.datetime_utils import format_timestamp
 
 
 def render_dashboard(
@@ -16,7 +17,7 @@ def render_dashboard(
 
     st.caption(
     "Enterprise data-quality monitoring for clinical, "
-    "operational, and financial healthcare domains"
+    "operational, and financial healthcare domains."
     )
 
     platform_score = calculate_platform_score(summary)
@@ -59,7 +60,9 @@ def render_dashboard(
     )
 
     if "run_timestamp" in summary.columns:
-        last_run = summary["run_timestamp"].iloc[0]
+        last_run = format_timestamp(
+            summary["run_timestamp"].iloc[0]
+        )
 
         st.info(
             f"Platform Status: {trust_status} | "

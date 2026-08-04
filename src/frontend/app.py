@@ -5,6 +5,7 @@ from src.frontend.views.rule_catalog import (
 
 import sys
 from pathlib import Path
+from src.frontend.views.audit_logs import render_audit_logs
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -19,6 +20,9 @@ from src.frontend.data_loader import (
     load_issues,
     load_summary,
     load_summary_history,
+)
+from src.frontend.views.pipeline_runs import (
+    render_pipeline_runs,
 )
 from src.frontend.styles import apply_ehr_styles
 from src.frontend.views.about import render_about
@@ -73,17 +77,16 @@ def main() -> None:
         render_rule_catalog()
 
     def pipeline_runs_page() -> None:
-        st.title("Pipeline Runs")
-        st.info(
-            "Pipeline run history and operational logs will be "
-            "added in an upcoming milestone."
-        )
+        render_pipeline_runs()
 
     def api_sources_page() -> None:
         render_data_sources()
 
     def about_page() -> None:
         render_about()
+
+    def audit_logs_page() -> None:
+        render_audit_logs()
 
     pages = [
     st.Page(
@@ -124,11 +127,18 @@ def main() -> None:
         url_path="pipeline-runs",
     ),
     st.Page(
+         audit_logs_page,
+         title="Audit Logs",
+         icon=":material/description:",
+         url_path="audit-logs",
+     ),   
+    st.Page(
         about_page,
         title="About",
         icon=":material/info:",
         url_path="about",
     ),
+  
 ]
 
     

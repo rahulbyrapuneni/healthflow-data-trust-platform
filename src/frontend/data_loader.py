@@ -378,3 +378,88 @@ def load_rule_filter_options() -> dict[str, list[str]]:
             .tolist()
         ),
     }
+
+def load_pipeline_runs() -> pd.DataFrame:
+    """Return one summarized record for each quality pipeline run."""
+
+    columns = [
+        "run_id",
+        "run_timestamp",
+        "datasets_processed",
+        "rows_checked",
+        "issues_detected",
+        "critical_issues",
+        "platform_trust_score",
+        "run_status",
+    ]
+
+    if not table_exists("dataset_trust_history"):
+        return pd.DataFrame(columns=columns)
+
+    runs = execute_query(
+        """
+        SELECT
+            run_id,
+            MIN(run_timestamp) AS run_timestamp,
+            COUNT(DISTINCT dataset) AS datasets_processed,
+            SUM(rows_checked) AS rows_checked,
+            SUM(issues_detected) AS issues_detected,
+            SUM(critical_issues) AS critical_issues,
+
+            ROUND(
+                SUM(trust_score * rows_checked)
+                / NULLIF(SUM(rows_checked), 0),
+                2
+            ) AS platform_trust_score,
+
+            CASE
+                WHEN SUM(critical_issues) > 0
+                    THEN 'Completed with critical issues'
+                ELSE 'Completed'
+            END AS run_status
+
+        FROM dataset_trust_history
+
+        GROUP BY run_id
+
+        ORDER BY MIN(run_timestamp) DESC
+        """
+    )
+
+    if "run_timestamp" in runs.columns:
+        runs["run_timestamp"] = pd.to_datetime(
+            runs["run_timestamp"],
+            errors="coerce",
+        )
+
+    return runs[columns]
+
+def load_pipeline_run_details(
+    run_id: str,
+) -> pd.DataFrame:
+    """Return dataset-level details for one pipeline run."""
+
+    if not run_id:
+        return pd.DataFrame()
+
+    if not table_exists("dataset_trust_history"):
+        return pd.DataFrame()
+
+    return execute_query(
+        """
+        SELECT
+            dataset,
+            rows_checked,
+            issues_detected,
+            critical_issues,
+            high_issues,
+            medium_issues,
+            low_issues,
+            trust_score,
+            status
+        FROM dataset_trust_history
+        WHERE run_id = ?
+        ORDER BY dataset
+        """,
+        [run_id],
+    )

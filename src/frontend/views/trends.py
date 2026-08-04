@@ -3,9 +3,8 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from src.frontend.data_loader import (
-    build_platform_history,
-)
+from src.frontend.data_loader import build_platform_history
+from src.utils.datetime_utils import format_timestamp
 
 
 def render_trends(
@@ -74,8 +73,8 @@ def render_trends(
     )
 
     st.caption(
-        f"Latest quality run: "
-        f"{latest['run_timestamp']}"
+        "Latest quality run: "
+        f"{format_timestamp(latest['run_timestamp'])}"
     )
 
     st.divider()
@@ -158,8 +157,17 @@ def render_trends(
         "status",
     ]
 
+    display_history = dataset_history[
+        display_columns
+    ].copy()
+
+    display_history["run_timestamp"] = (
+        display_history["run_timestamp"]
+        .apply(format_timestamp)
+    )
+
     st.dataframe(
-        dataset_history[display_columns],
+        display_history,
         use_container_width=True,
         hide_index=True,
     )
