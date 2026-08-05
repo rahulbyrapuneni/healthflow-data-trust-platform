@@ -274,6 +274,19 @@ def apply_ehr_styles() -> None:
             display: none;
         }
 
+        /* HealthFlow branding above sidebar navigation */
+        [data-testid="stSidebarNav"]::before {
+            content: "HealthFlow";
+            display: block;
+            color: var(--hf-white);
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            padding: 0.4rem 1rem 0.75rem 1rem;
+            margin-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
         /* Responsive layout */
         @media (max-width: 900px) {
             [data-testid="stMainBlockContainer"] {

@@ -171,16 +171,12 @@ def main() -> None:
     ),
   
 ]
-
-    
     navigation = st.navigation(
         pages,
         position="sidebar",
     )
 
     with st.sidebar:
-        st.markdown("## HealthFlow")
-        st.caption("Healthcare Data Trust Platform")
         st.caption("Version 0.5")
 
     navigation.run()
