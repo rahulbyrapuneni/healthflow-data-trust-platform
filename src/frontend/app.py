@@ -16,8 +16,6 @@ from src.frontend.views.rule_catalog import (
     render_rule_catalog,
 )
 
-
-
 import streamlit as st
 
 from src.frontend.data_loader import (

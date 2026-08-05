@@ -1,115 +1,242 @@
-# HealthFlow Data Trust Platform
+# 🏥 HealthFlow
 
-An open-source healthcare data quality platform that answers one practical question:
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-Live-red)
+![DuckDB](https://img.shields.io/badge/Database-DuckDB-orange)
+![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-> Can we trust the data used for healthcare reporting, operations, and research?
+## Enterprise Healthcare Data Trust Platform
 
-The platform generates synthetic healthcare data, detects quality problems, scores data trustworthiness, and explains issues in a reproducible local environment.
+HealthFlow is an enterprise-style healthcare data governance platform that ingests healthcare datasets, performs automated data quality validation, calculates trust scores, tracks historical quality metrics, and provides interactive dashboards for monitoring healthcare data reliability.
 
-## 🌐 Live Demo
+The platform demonstrates modern healthcare data engineering concepts including automated quality validation, data governance, pipeline monitoring, lineage tracking, audit logging, and analytical reporting.
 
-**Streamlit Application**
+---
 
-https://baz83aeke5yvqtrpbbavuc.streamlit.app/
+## 🚀 Live Demo
 
-## Core problem
+**HealthFlow Application**
 
-Healthcare organizations combine data from registration, scheduling, laboratory, billing, insurance, and clinical systems. The resulting datasets often contain duplicate patients, missing demographics, invalid clinical codes, orphan records, inconsistent dates, and conflicting values.
+https://healthflow-data-trust-platform-kwkfypzkt4qibaueasxrel.streamlit.app/
 
-These problems reduce confidence in dashboards, delay reporting, and force analysts and researchers to spend substantial time manually validating data.
+---
 
-## Initial scope
+## ✨ Key Features
 
-Version 1 focuses on five datasets:
+### Executive Dashboard
+- Enterprise healthcare trust score
+- Dataset health monitoring
+- Quality exception tracking
+- Executive KPI cards
 
-- Patients
-- Appointments
-- Laboratory results
-- Claims
-- Insurance coverage
+### Trust Trends
+- Historical trust score monitoring
+- Pipeline execution history
+- Trend visualization
+- Dataset-level quality history
 
-The first quality rules detect:
+### Issue Explorer
+- Searchable quality issues
+- Severity filtering
+- Business impact analysis
+- Recommended remediation
 
-- Duplicate patient records
-- Missing dates of birth
-- Invalid gender values
-- Future birth dates
-- Orphan appointments and laboratory records
-- Appointments before birth
-- Negative claim amounts
-- Paid amounts greater than billed amounts
-- Missing insurance coverage
-- Impossible laboratory values
+### Data Sources
+- Connected healthcare datasets
+- Source system monitoring
+- Refresh status
+- Data availability overview
 
-## Technology principles
+### Rule Catalog
+- Healthcare data quality rules
+- Validation categories
+- Rule severity
+- Business rationale
 
-- Free and open-source
-- Runs locally
-- No cloud subscription
-- No proprietary healthcare access
-- No paid APIs
-- Synthetic data only
-- Reproducible setup
-- Every tool must solve a real problem
+### Pipeline Runs
+- Historical execution monitoring
+- Run-level metrics
+- Dataset execution details
+- Downloadable execution reports
 
-## Initial stack
+### Audit Logs
+- Operational logging
+- Component-level monitoring
+- Error and warning tracking
+- Searchable audit history
 
-- Python
-- Pandas
-- Faker
-- DuckDB
-- Pytest
-- Git and GitHub
-- Streamlit later, when the quality engine is stable
-- PySpark later, only when the dataset and transformations justify it
+### Data Lineage
+- End-to-end healthcare data flow
+- Data ingestion architecture
+- Validation pipeline
+- Analytics lifecycle
 
-## Run the simulator
+---
 
-```bash
-python -m venv .venv
+# 🏗 Platform Architecture
+
+```
+              External Healthcare Sources
+                        │
+        ┌───────────────┴────────────────┐
+        │                                │
+        ▼                                ▼
+     CMS API                   Local Data Simulator
+        │                                │
+        └───────────────┬────────────────┘
+                        ▼
+               Data Ingestion Layer
+                        │
+                        ▼
+           Healthcare Quality Validation
+                        │
+          ┌─────────────┴─────────────┐
+          ▼                           ▼
+    Quality Issues           Trust Summary
+          │                           │
+          └─────────────┬─────────────┘
+                        ▼
+               DuckDB Analytics Store
+                        │
+        ┌───────────────┼──────────────────────┐
+        ▼               ▼                      ▼
+   Dashboard      Trust Trends        Audit Logs
+                        │
+                        ▼
+             Executive Decision Support
 ```
 
-Windows:
+---
 
-```bash
-.venv\Scripts\activate
+# 🛠 Technology Stack
+
+| Category | Technology |
+|-----------|------------|
+| Language | Python |
+| Dashboard | Streamlit |
+| Database | DuckDB |
+| API Integration | CMS Healthcare API |
+| Data Processing | Pandas |
+| Testing | Pytest |
+| Version Control | Git & GitHub |
+| Deployment | Streamlit Community Cloud |
+
+---
+
+# 📊 Platform Capabilities
+
+- Enterprise Healthcare Dashboard
+- Automated Data Quality Validation
+- Healthcare Trust Score Calculation
+- Historical Trend Monitoring
+- Rule-Based Validation Engine
+- Audit Logging
+- Pipeline Monitoring
+- Data Lineage
+- Data Governance
+- Interactive Analytics
+- Executive Reporting
+
+---
+
+# 📁 Project Structure
+
+```
+healthflow-data-trust-platform/
+
+├── data/
+│   ├── analytics/
+│   ├── quality_results/
+│   └── source_data/
+│
+├── src/
+│   ├── analytics/
+│   ├── api/
+│   ├── frontend/
+│   ├── quality/
+│   ├── simulator/
+│   └── utils/
+│
+├── tests/
+│
+├── requirements.txt
+├── streamlit_app.py
+└── README.md
 ```
 
-macOS/Linux:
+---
+
+# ⚙ Installation
+
+Clone the repository
 
 ```bash
-source .venv/bin/activate
+git clone https://github.com/rahulbyrapuneni/healthflow-data-trust-platform.git
 ```
 
-Install dependencies:
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Generate data:
+Run quality validation
 
 ```bash
-python src/simulator/generate_data.py
+python -m src.quality.run_quality_checks
 ```
 
-The generated CSV files will appear in `data/raw/`.
+Load the analytics database
 
-## Project roadmap
+```bash
+python -m src.analytics.load_analytics_store
+```
 
-1. Sprint 0: problem definition, architecture, quality rules, repository setup
-2. Sprint 1: synthetic healthcare data generator
-3. Sprint 2: data profiling and validation engine
-4. Sprint 3: trust score and issue prioritization
-5. Sprint 4: DuckDB analytics layer
-6. Sprint 5: monitoring dashboard
-7. Sprint 6: optional local AI explanations
-8. Sprint 7: tests, Docker, CI/CD, documentation, and final demo
+Launch the application
 
-## Portfolio outcome
+```bash
+streamlit run streamlit_app.py
+```
 
-This project demonstrates healthcare data engineering, data quality, governance, analytics engineering, SQL, Python, testing, architecture, and technical communication without relying on restricted systems or paid services.
+---
 
-## License
+# 🧪 Testing
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Execute the automated test suite
+
+```bash
+pytest
+```
+
+HealthFlow includes automated tests covering:
+
+- Data ingestion
+- Healthcare quality rules
+- API integration
+- Analytics layer
+- Pipeline execution
+- Frontend utilities
+- Audit logging
+
+
+---
+
+# 🚧 Roadmap
+
+Upcoming enhancements
+
+- ClinicalTrials.gov integration
+- openFDA integration
+- AI-powered Quality Assistant
+- Executive PDF reports
+- Advanced analytics
+- Multi-source healthcare monitoring
+
+---
+
+# 👨‍💻 About
+
+HealthFlow was developed as an enterprise healthcare data governance platform to demonstrate practical data engineering, quality assurance, analytics, and governance concepts using publicly available healthcare datasets.
+
+The project showcases an end-to-end healthcare data platform—from ingestion and validation to monitoring, reporting, and operational oversight.
