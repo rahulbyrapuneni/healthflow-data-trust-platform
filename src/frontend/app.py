@@ -177,7 +177,7 @@ def main() -> None:
     )
 
     with st.sidebar:
-        st.caption("Version 0.5")
+        st.caption("Version v1.0")
 
     navigation.run()
 
