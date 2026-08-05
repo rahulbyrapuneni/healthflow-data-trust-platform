@@ -4,7 +4,7 @@ import pandas as pd
 
 from src.frontend.views.data_sources import (
     count_csv_rows,
-    format_timestamp,
+    format_file_timestamp,
 )
 
 
@@ -40,6 +40,6 @@ def test_missing_file_timestamp_is_unavailable(
     missing_file = tmp_path / "missing.csv"
 
     assert (
-        format_timestamp(missing_file)
+        format_file_timestamp(missing_file)
         == "Not available"
     )
