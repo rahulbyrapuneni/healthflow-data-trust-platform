@@ -2,5 +2,5 @@ pandas==2.3.3
 Faker==37.4.2
 duckdb==1.4.3
 pytest==9.0.0
-streamlit
-requests
+streamlit==1.59.2
+requests==2.32.5
