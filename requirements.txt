@@ -3,4 +3,5 @@ Faker==37.4.2
 duckdb==1.4.3
 pytest==9.0.0
 streamlit==1.59.2
+starlette==0.52.1
 requests==2.32.5
